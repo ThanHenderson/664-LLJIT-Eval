@@ -5,7 +5,7 @@
 ```
 cmake ../llvm                                         \
   -GNinja                                             \
-  -DLLVM_TARGETS_TO_BUILD=X86						              \
+  -DLLVM_TARGETS_TO_BUILD=X86                         \
   -DLLVM_OPTIMIZED_TABLEGEN=ON                        \
   -DLLVM_INSTALL_UTILS=ON                             \
   -DLLVM_CCACHE_BUILD=ON                              \

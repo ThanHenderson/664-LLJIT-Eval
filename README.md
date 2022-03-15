@@ -33,7 +33,7 @@ make
 
 ### Running a program
 ```
-./LLJIT <program-name>*
+./LLJIT program-name
 ```
 
-where <program-name> is a file from the *program* subdirectory. 
+where *program-name* is a file from the *program* subdirectory. 

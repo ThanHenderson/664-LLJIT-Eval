@@ -7,49 +7,14 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IRReader/IRReader.h"
 
+#include <string>
+
 #include "JitDriver.h"
 
 using namespace llvm;
 using namespace llvm::orc;
 
-namespace {
-
-struct FnMap {
-  const char *fName;
-  const void *fAddr;
-};
-
-// This will need to be updated with any functions that are needed.
-std::vector<FnMap> getFns(void)
-{
-  FnMap m[] = {
-    {"printf", (void *)printf},
-    {"malloc", (void *)malloc}
-  };
-
-  return std::vector<FnMap>(std::begin(m), std::end(m));
-}
-
-// Add functions in from library (SRTL in this case) that the JIT'd code can access.
-Error addBuiltins(orc::LLJIT &jitInstance, const DataLayout &DL) {
-  orc::SymbolMap M;
-  orc::MangleAndInterner Mangle(jitInstance.getExecutionSession(), DL);
-  // Register every symbol that can be accessed from the JIT'ed code.
-  auto fns = getFns();
-  for (auto fn : fns) {
-    M[Mangle(fn.fName)] = JITEvaluatedSymbol(
-        pointerToJITTargetAddress(fn.fAddr), JITSymbolFlags());
-  }
-
-  if (auto Err = (jitInstance.getMainJITDylib().define(absoluteSymbols(M))))
-    return Err;
-
-  return Error::success();
-}
-
-} // anonymous namespace
-
-
+// Command line arguments
 ExitOnError ExitOnErr;
 cl::opt<std::string> InputFilename(cl::Positional,
                                    cl::desc("<input file>"),
@@ -77,6 +42,10 @@ int main(int argc, char *argv[]) {
   cl::ParseCommandLineOptions(argc, argv, "LLJITDumpObjects");
   ExitOnErr.setBanner(std::string(argv[0]) + ": ");
 
+  // Creates fresh IR from the provided code
+  std::string FrontCmd = "$CCOMP -emit-llvm -S programs/"+InputFilename+".c";
+  system(FrontCmd.c_str());
+
   outs()
       << "Usage notes:\n"
          "  Use -debug-only=orc on debug builds to see log messages of objects "
@@ -86,16 +55,16 @@ int main(int argc, char *argv[]) {
          "  Specify -dump-jitted-objects=false to disable dumping\n";
 
   auto J = ExitOnErr(LLJITBuilder().create());
+  J->getMainJITDylib().addGenerator(
+	ExitOnErr(DynamicLibrarySearchGenerator::GetForCurrentProcess(
+		J->getDataLayout().getGlobalPrefix())));
 
   if (DumpJITdObjects)
     J->getObjTransformLayer().setTransform(DumpObjects(DumpDir, DumpFileStem));
  
-  auto M = ExitOnErr(parseModuleFromFile(InputFilename));
+  auto M = ExitOnErr(parseModuleFromFile("helloworld.ll")); //InputFilename+".ll"));
 
   ExitOnErr(J->addIRModule(std::move(M)));
-  
-  if (auto Err = addBuiltins(*J, J->getDataLayout()))
-      return 0;
 
   // Look up the JIT'd function, cast it to a function pointer, then call it.
   auto jitMainSym = ExitOnErr(J->lookup("main"));
@@ -103,6 +72,8 @@ int main(int argc, char *argv[]) {
 
   auto jitMain = reinterpret_cast<void (*)()>(jitMainAddr);
   jitMain();
+
+  system("rm *.ll *.o -rf");
 
   return 0;
 }

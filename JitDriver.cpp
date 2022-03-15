@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
   if (DumpJITdObjects)
     J->getObjTransformLayer().setTransform(DumpObjects(DumpDir, DumpFileStem));
  
-  auto M = ExitOnErr(parseModuleFromFile("helloworld.ll")); //InputFilename+".ll"));
+  auto M = ExitOnErr(parseModuleFromFile("helloworld.ll")); 
 
   ExitOnErr(J->addIRModule(std::move(M)));
 

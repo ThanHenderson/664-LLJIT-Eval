@@ -1,0 +1,6 @@
+[submodule "quickjs"]
+	path = quickjs
+	url = https://github.com/bellard/quickjs.git
+[submodule "664-llvm"]
+	path = 664-llvm
+	url = https://github.com/tgobran/664-llvm.git

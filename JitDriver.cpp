@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   ExitOnErr.setBanner(std::string(argv[0]) + ": ");
 
   // Creates fresh IR from the provided code
-  std::string FrontCmd = "$CCOMP -emit-llvm -S programs/"+InputFilename+".c";
+  std::string FrontCmd = "$CCOMP -Iquickjs -emit-llvm -S programs/"+InputFilename+".c";
   system(FrontCmd.c_str());
 
   outs()
@@ -58,11 +58,32 @@ int main(int argc, char *argv[]) {
   J->getMainJITDylib().addGenerator(
 	ExitOnErr(DynamicLibrarySearchGenerator::GetForCurrentProcess(
 		J->getDataLayout().getGlobalPrefix())));
+// .obj/qjsc.o .obj/quickjs.o .obj/libregexp.o .obj/libunicode.o .obj/cutils.o .obj/quickjs-libc.o .obj/libbf.o -lm -ldl -lpthread 
 
+  std::string objectFileName("quickjs/.obj/qjs.o");
+  auto Obj = ExitOnErr(errorOrToExpected(MemoryBuffer::getFile(objectFileName)));
+  ExitOnErr(J->addObjectFile(std::move(Obj))); 
+ 
+  std::string objectFileName1("quickjs/.obj/quickjs.o");
+  auto Obj1 = ExitOnErr(errorOrToExpected(MemoryBuffer::getFile(objectFileName1)));
+  ExitOnErr(J->addObjectFile(std::move(Obj1))); 
+  
+  std::string objectFileName2("quickjs/.obj/libregexp.o");
+  auto Obj2 = ExitOnErr(errorOrToExpected(MemoryBuffer::getFile(objectFileName2)));
+  ExitOnErr(J->addObjectFile(std::move(Obj2))); 
+  
+  std::string objectFileName3("quickjs/.obj/libunicode.o");
+  auto Obj3 = ExitOnErr(errorOrToExpected(MemoryBuffer::getFile(objectFileName3)));
+  ExitOnErr(J->addObjectFile(std::move(Obj3))); 
+  
+  std::string objectFileName4("quickjs/.obj/quickjs-libc.o");
+  auto Obj4 = ExitOnErr(errorOrToExpected(MemoryBuffer::getFile(objectFileName4)));
+  ExitOnErr(J->addObjectFile(std::move(Obj4)));
+  
   if (DumpJITdObjects)
     J->getObjTransformLayer().setTransform(DumpObjects(DumpDir, DumpFileStem));
  
-  auto M = ExitOnErr(parseModuleFromFile("helloworld.ll")); 
+  auto M = ExitOnErr(parseModuleFromFile(InputFilename+".ll")); 
 
   ExitOnErr(J->addIRModule(std::move(M)));
 

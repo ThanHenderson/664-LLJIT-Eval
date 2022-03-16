@@ -1,7 +1,7 @@
 LLVM_DIR=$(shell pwd)/664-llvm
-.DEFAULT_GOAL := LLJIT
+.DEFAULT_GOAL := lljit
 
-all : llvm quickjs LLJIT
+all : llvm quickjs lljit
 
 llvm :
 	mkdir -p $(LLVM_DIR)/build

@@ -19,7 +19,7 @@ llvm :
 		-DLLVM_ENABLE_PROJECTS="clang;lldb;compiler-rt"    \
 		-DCMAKE_C_COMPILER=clang                           \
 		-DCMAKE_CXX_COMPILER=clang++                       \
-	&& ninja -j2
+	&& cmake --build .
 
 qjs :
 	$(MAKE) -C quickjs

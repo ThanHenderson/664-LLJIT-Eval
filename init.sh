@@ -1,3 +1,5 @@
+#!/bin/bash
+
 export CCOMP=./664-llvm/build/bin/clang
 export CXXCOMP=./664-llvm/build/bin/clang++
 export LLVMCONFIG=./664-llvm/build/bin/llvm-config

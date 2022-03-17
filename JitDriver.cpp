@@ -46,6 +46,7 @@ int main(int argc, char *argv[]) {
   std::string FrontCmd = "$CCOMP -Iquickjs -emit-llvm -S programs/"+InputFilename+".c";
   system(FrontCmd.c_str());
 
+  /*
   outs()
       << "Usage notes:\n"
          "  Use -debug-only=orc on debug builds to see log messages of objects "
@@ -53,13 +54,15 @@ int main(int argc, char *argv[]) {
          "  Specify -dump-dir to specify a dump directory\n"
          "  Specify -dump-file-stem to override the dump file stem\n"
          "  Specify -dump-jitted-objects=false to disable dumping\n";
+  */
 
   auto J = ExitOnErr(LLJITBuilder().create());
   
-//  J->getMainJITDylib().addGenerator(
-//	ExitOnErr(DynamicLibrarySearchGenerator::GetForCurrentProcess(
-//		J->getDataLayout().getGlobalPrefix())));
-//
+  J->getMainJITDylib().addGenerator(
+    ExitOnErr(DynamicLibrarySearchGenerator::GetForCurrentProcess(
+	    J->getDataLayout().getGlobalPrefix()
+	  )));
+ 
   J->getMainJITDylib().addGenerator(
     ExitOnErr(DynamicLibrarySearchGenerator::Load(
             "quickjs/.obj/test.so",
@@ -77,8 +80,8 @@ int main(int argc, char *argv[]) {
   auto jitMainSym = ExitOnErr(J->lookup("main"));
   auto jitMainAddr = jitMainSym.getAddress();
 
-  auto jitMain = reinterpret_cast<void (*)()>(jitMainAddr);
-  jitMain();
+  auto jitMain = reinterpret_cast<void (*)(int,char**)>(jitMainAddr);
+  jitMain(0, nullptr);
 
   system("rm *.ll *.o -rf");
 

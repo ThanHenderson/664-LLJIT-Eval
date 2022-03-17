@@ -55,30 +55,16 @@ int main(int argc, char *argv[]) {
          "  Specify -dump-jitted-objects=false to disable dumping\n";
 
   auto J = ExitOnErr(LLJITBuilder().create());
+  
+//  J->getMainJITDylib().addGenerator(
+//	ExitOnErr(DynamicLibrarySearchGenerator::GetForCurrentProcess(
+//		J->getDataLayout().getGlobalPrefix())));
+//
   J->getMainJITDylib().addGenerator(
-	ExitOnErr(DynamicLibrarySearchGenerator::GetForCurrentProcess(
-		J->getDataLayout().getGlobalPrefix())));
-// .obj/qjsc.o .obj/quickjs.o .obj/libregexp.o .obj/libunicode.o .obj/cutils.o .obj/quickjs-libc.o .obj/libbf.o -lm -ldl -lpthread 
-
-  std::string objectFileName("quickjs/.obj/qjs.o");
-  auto Obj = ExitOnErr(errorOrToExpected(MemoryBuffer::getFile(objectFileName)));
-  ExitOnErr(J->addObjectFile(std::move(Obj))); 
- 
-  std::string objectFileName1("quickjs/.obj/quickjs.o");
-  auto Obj1 = ExitOnErr(errorOrToExpected(MemoryBuffer::getFile(objectFileName1)));
-  ExitOnErr(J->addObjectFile(std::move(Obj1))); 
-  
-  std::string objectFileName2("quickjs/.obj/libregexp.o");
-  auto Obj2 = ExitOnErr(errorOrToExpected(MemoryBuffer::getFile(objectFileName2)));
-  ExitOnErr(J->addObjectFile(std::move(Obj2))); 
-  
-  std::string objectFileName3("quickjs/.obj/libunicode.o");
-  auto Obj3 = ExitOnErr(errorOrToExpected(MemoryBuffer::getFile(objectFileName3)));
-  ExitOnErr(J->addObjectFile(std::move(Obj3))); 
-  
-  std::string objectFileName4("quickjs/.obj/quickjs-libc.o");
-  auto Obj4 = ExitOnErr(errorOrToExpected(MemoryBuffer::getFile(objectFileName4)));
-  ExitOnErr(J->addObjectFile(std::move(Obj4)));
+    ExitOnErr(DynamicLibrarySearchGenerator::Load(
+            "quickjs/.obj/test.so",
+            J->getDataLayout().getGlobalPrefix()
+          )));
   
   if (DumpJITdObjects)
     J->getObjTransformLayer().setTransform(DumpObjects(DumpDir, DumpFileStem));

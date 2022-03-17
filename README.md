@@ -36,4 +36,11 @@ make
 ./LLJIT program-name
 ```
 
-where *program-name* is a file from the *program* subdirectory. 
+where *program-name* is a file from the *program* subdirectory.
+
+
+#### Temp for debug
+Navigate to quickjs/.obj/ and run:
+```
+gcc -g -shared -flto -fPIC -o test.so cutils.o libbf.o libregexp.o libunicode.o quickjs-libc.o qjsc.o qjscalc.o quickjs.o
+```

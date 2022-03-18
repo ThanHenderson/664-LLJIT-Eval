@@ -23,7 +23,7 @@ make qjs
 
 ### Set environment variables
 ```
-source init
+source init.sh
 ```
 
 ### Build LLJIT (creates LLJIT executable)
@@ -37,10 +37,3 @@ make
 ```
 
 where *program-name* is a file from the *program* subdirectory.
-
-
-#### Temp for debug
-Navigate to quickjs/.obj/ and run:
-```
-gcc -g -shared -flto -fPIC -o test.so cutils.o libbf.o libregexp.o libunicode.o quickjs-libc.o qjsc.o qjscalc.o quickjs.o
-```

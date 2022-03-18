@@ -14,7 +14,6 @@
 using namespace llvm;
 using namespace llvm::orc;
 
-// Command line arguments
 ExitOnError ExitOnErr;
 cl::opt<std::string> InputFilename(cl::Positional,
                                    cl::desc("<input file>"),
@@ -33,7 +32,7 @@ cl::opt<std::string> DumpFileStem("dump-file-stem",
                                   cl::Optional, cl::init(""));
 
 int main(int argc, char *argv[]) {
-  // Initialize LLVM.
+  // Boilerplate initialization of LLVM.
   InitLLVM X(argc, argv);
 
   InitializeNativeTarget();
@@ -42,13 +41,12 @@ int main(int argc, char *argv[]) {
   cl::ParseCommandLineOptions(argc, argv, "LLJITDumpObjects");
   ExitOnErr.setBanner(std::string(argv[0]) + ": ");
 
-  // Creates fresh IR from the provided code
+  // Creates fresh IR from the provided code.
   std::string FrontCmd = "$CCOMP -Iquickjs -emit-llvm -S programs/"+InputFilename+".c";
   system(FrontCmd.c_str());
 
   /*
-  outs()
-      << "Usage notes:\n"
+         "Usage notes:\n"
          "  Use -debug-only=orc on debug builds to see log messages of objects "
          "being dumped\n"
          "  Specify -dump-dir to specify a dump directory\n"
@@ -65,7 +63,7 @@ int main(int argc, char *argv[]) {
  
   J->getMainJITDylib().addGenerator(
     ExitOnErr(DynamicLibrarySearchGenerator::Load(
-            "quickjs/.obj/test.so",
+            "quickjs/.obj/quickjs.so",
             J->getDataLayout().getGlobalPrefix()
           )));
   
@@ -76,7 +74,7 @@ int main(int argc, char *argv[]) {
 
   ExitOnErr(J->addIRModule(std::move(M)));
 
-  // Look up the JIT'd function, cast it to a function pointer, then call it.
+  // Look up the JIT'd function then call it.
   auto jitMainSym = ExitOnErr(J->lookup("main"));
   auto jitMainAddr = jitMainSym.getAddress();
 

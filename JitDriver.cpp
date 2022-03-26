@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   ExitOnErr.setBanner(std::string(argv[0]) + ": ");
 
   // Creates fresh IR from the provided code.
-  std::string FrontCmd = "$CCOMP -Iquickjs -emit-llvm -S programs/"+InputFilename+".c";
+  std::string FrontCmd = "$CCOMP -Iquickjs -g -emit-llvm -S programs/"+InputFilename+".c";
   system(FrontCmd.c_str());
 
   /*
@@ -81,6 +81,8 @@ int main(int argc, char *argv[]) {
   auto jitMain = reinterpret_cast<void (*)(int,char**)>(jitMainAddr);
   jitMain(0, nullptr);
 
+  system(("mkdir -p ./out/"+InputFilename).c_str());
+  system(("cp "+InputFilename+"*.ll "+InputFilename+"*.o ./out/"+InputFilename).c_str());
   system("rm *.ll *.o -rf");
 
   return 0;

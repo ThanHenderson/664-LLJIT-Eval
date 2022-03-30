@@ -23,6 +23,10 @@ cl::opt<bool> DumpJITdObjects("dump-jitted-objects",
                               cl::desc("dump jitted objects"), cl::Optional,
                               cl::init(true));
 
+cl::opt<bool> ActivateCFI("activate-cfi",
+                              cl::desc("Make Control Flow Integrity Active"), cl::Optional,
+                              cl::init(false));
+
 cl::opt<std::string> DumpDir("dump-dir",
                              cl::desc("directory to dump objects to"),
                              cl::Optional, cl::init(""));
@@ -42,7 +46,12 @@ int main(int argc, char *argv[]) {
   ExitOnErr.setBanner(std::string(argv[0]) + ": ");
 
   // Creates fresh IR from the provided code.
+  std::string FileSuffix = ".ll";
   std::string FrontCmd = "$CCOMP -Iquickjs -emit-llvm -S programs/"+InputFilename+".c";
+  if (ActivateCFI) {
+	  FileSuffix = ".s";
+	  FrontCmd = FrontCmd + " -fvisibility=hidden -fsanitize=cfi -flto";
+  }
   system(FrontCmd.c_str());
 
   /*
@@ -69,8 +78,8 @@ int main(int argc, char *argv[]) {
   
   if (DumpJITdObjects)
     J->getObjTransformLayer().setTransform(DumpObjects(DumpDir, DumpFileStem));
- 
-  auto M = ExitOnErr(parseModuleFromFile(InputFilename+".ll")); 
+
+  auto M = ExitOnErr(parseModuleFromFile(InputFilename+FileSuffix)); 
 
   ExitOnErr(J->addIRModule(std::move(M)));
 
@@ -81,7 +90,7 @@ int main(int argc, char *argv[]) {
   auto jitMain = reinterpret_cast<void (*)(int,char**)>(jitMainAddr);
   jitMain(0, nullptr);
 
-  system("rm *.ll *.o -rf");
+  system("rm *.ll *.o *.s -rf");
 
   return 0;
 }

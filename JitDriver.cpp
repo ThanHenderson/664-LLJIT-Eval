@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 
   // Creates fresh IR from the provided code.
   std::string FileSuffix = ".ll";
-  std::string FrontCmd = "$CCOMP -Iquickjs -emit-llvm -S programs/"+InputFilename+".c";
+  std::string FrontCmd = "$CCOMP -Iquickjs -g -emit-llvm -S programs/"+InputFilename+".c";
   if (ActivateCFI) {
 	  FileSuffix = ".s";
 	  FrontCmd = FrontCmd + " -fvisibility=hidden -fsanitize=cfi -flto";
@@ -90,6 +90,8 @@ int main(int argc, char *argv[]) {
   auto jitMain = reinterpret_cast<void (*)(int,char**)>(jitMainAddr);
   jitMain(0, nullptr);
 
+  system(("mkdir -p ./out/"+InputFilename).c_str());
+  system(("cp "+InputFilename+"*.ll "+InputFilename+"*.o ./out/"+InputFilename).c_str());
   system("rm *.ll *.o *.s -rf");
 
   return 0;

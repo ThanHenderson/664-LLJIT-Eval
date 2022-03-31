@@ -15,6 +15,7 @@ git submodule update
 ```
 make llvm
 ```
+This can take an extreme amount of time, be patient.
 
 ### Build quickjs
 ```

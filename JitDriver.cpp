@@ -2,6 +2,7 @@
 #include "llvm/ExecutionEngine/Orc/DebugUtils.h"
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
 #include "llvm/ExecutionEngine/Orc/ObjectTransformLayer.h"
+#include "llvm/Support/Debug.h"
 #include "llvm/Support/InitLLVM.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/raw_ostream.h"
@@ -29,7 +30,7 @@ cl::opt<bool> ActivateCFI("activate-cfi",
 
 cl::opt<std::string> DumpDir("dump-dir",
                              cl::desc("directory to dump objects to"),
-                             cl::Optional, cl::init(""));
+                             cl::Optional, cl::init("."));
 
 cl::opt<std::string> DumpFileStem("dump-file-stem",
                                   cl::desc("Override default dump names"),
@@ -38,6 +39,8 @@ cl::opt<std::string> DumpFileStem("dump-file-stem",
 int main(int argc, char *argv[]) {
   // Boilerplate initialization of LLVM.
   InitLLVM X(argc, argv);
+
+  DebugFlag = true;   
 
   InitializeNativeTarget();
   InitializeNativeTargetAsmPrinter();
@@ -79,13 +82,22 @@ int main(int argc, char *argv[]) {
   if (DumpJITdObjects)
     J->getObjTransformLayer().setTransform(DumpObjects(DumpDir, DumpFileStem));
 
+  LLVM_DEBUG(dbgs() << "Parsing IR from file\n")
+
   auto M = ExitOnErr(parseModuleFromFile(InputFilename+FileSuffix)); 
+  
+  LLVM_DEBUG(dbgs() << "Adding IR to Module\n")
 
   ExitOnErr(J->addIRModule(std::move(M)));
+  
+  LLVM_DEBUG(dbgs() << "Performing Function lookup\n")
 
   // Look up the JIT'd function then call it.
   auto jitMainSym = ExitOnErr(J->lookup("main"));
+  
   auto jitMainAddr = jitMainSym.getAddress();
+  
+  LLVM_DEBUG(dbgs() << "Calling JIT function\n")
 
   auto jitMain = reinterpret_cast<void (*)(int,char**)>(jitMainAddr);
   jitMain(0, nullptr);

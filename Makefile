@@ -21,7 +21,7 @@ llvm :
 		-DCMAKE_CXX_COMPILER=clang++                       \
 	&& cmake --build .
 
-llvm-permissions :
+llvm-debug :
 	mkdir -p $(LLVM_DIR)/build
 	cd $(LLVM_DIR)/build \
 	&& cmake ../llvm \

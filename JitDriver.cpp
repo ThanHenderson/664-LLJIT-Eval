@@ -12,6 +12,8 @@
 
 #include "JitDriver.h"
 
+#define DEBUG_TYPE "orc"
+
 using namespace llvm;
 using namespace llvm::orc;
 
@@ -19,6 +21,14 @@ ExitOnError ExitOnErr;
 cl::opt<std::string> InputFilename(cl::Positional,
                                    cl::desc("<input file>"),
                                    cl::Required);
+
+cl::opt<bool> LLVMDebug("dump-llvm-debug",
+                              cl::desc("Output llvm debug information"), cl::Optional,
+                              cl::init(false));
+
+cl::opt<bool> DisableGenerators("disable-generators",
+                              cl::desc("Disable all symbol generators"), cl::Optional,
+                              cl::init(false));
 
 cl::opt<bool> DumpJITdObjects("dump-jitted-objects",
                               cl::desc("dump jitted objects"), cl::Optional,
@@ -40,13 +50,15 @@ int main(int argc, char *argv[]) {
   // Boilerplate initialization of LLVM.
   InitLLVM X(argc, argv);
 
-  DebugFlag = true;   
-
   InitializeNativeTarget();
   InitializeNativeTargetAsmPrinter();
 
   cl::ParseCommandLineOptions(argc, argv, "LLJITDumpObjects");
   ExitOnErr.setBanner(std::string(argv[0]) + ": ");
+  
+  if (LLVMDebug) {
+  	DebugFlag = true;
+  }
 
   // Creates fresh IR from the provided code.
   std::string FileSuffix = ".ll";
@@ -67,37 +79,39 @@ int main(int argc, char *argv[]) {
   */
 
   auto J = ExitOnErr(LLJITBuilder().create());
-  
-  J->getMainJITDylib().addGenerator(
+ 
+  if (!DisableGenerators) {
+    J->getMainJITDylib().addGenerator(
     ExitOnErr(DynamicLibrarySearchGenerator::GetForCurrentProcess(
 	    J->getDataLayout().getGlobalPrefix()
 	  )));
  
-  J->getMainJITDylib().addGenerator(
+    J->getMainJITDylib().addGenerator(
     ExitOnErr(DynamicLibrarySearchGenerator::Load(
             "quickjs/.obj/quickjs.so",
             J->getDataLayout().getGlobalPrefix()
           )));
+  } 
   
   if (DumpJITdObjects)
     J->getObjTransformLayer().setTransform(DumpObjects(DumpDir, DumpFileStem));
 
-  LLVM_DEBUG(dbgs() << "Parsing IR from file\n")
+  LLVM_DEBUG(dbgs() << "Parsing IR from file\n");
 
   auto M = ExitOnErr(parseModuleFromFile(InputFilename+FileSuffix)); 
   
-  LLVM_DEBUG(dbgs() << "Adding IR to Module\n")
+  LLVM_DEBUG(dbgs() << "Adding IR to Module\n");
 
   ExitOnErr(J->addIRModule(std::move(M)));
   
-  LLVM_DEBUG(dbgs() << "Performing Function lookup\n")
+  LLVM_DEBUG(dbgs() << "Performing Function lookup\n");
 
   // Look up the JIT'd function then call it.
   auto jitMainSym = ExitOnErr(J->lookup("main"));
   
   auto jitMainAddr = jitMainSym.getAddress();
   
-  LLVM_DEBUG(dbgs() << "Calling JIT function\n")
+  LLVM_DEBUG(dbgs() << "Calling JIT function\n");
 
   auto jitMain = reinterpret_cast<void (*)(int,char**)>(jitMainAddr);
   jitMain(0, nullptr);

@@ -16,6 +16,9 @@ git submodule update
 make llvm
 ```
 This can take an extreme amount of time, be patient.
+Note that the LLVM build in the Makefile is set for X86 targets only. If building
+for a different machine, the Makefile will need to be altered.
+
 
 ### Build quickjs
 ```
@@ -37,4 +40,10 @@ make
 ./LLJIT program-name
 ```
 
-where *program-name* is a file from the *program* subdirectory.
+where *program-name* is a file from the *programs* subdirectory.
+
+
+## Programs
+
+The test progams are in the *programs* subdirectory. Within that directory is a 
+README file that has more information on the purpose and/or source of each file.

@@ -14,6 +14,16 @@ This file is used to verify that the Javascript libraries are properly linked in
 
 ## Test Files
 
+### ControlFlowIntegrity
+This file is used to test the control flow system within LLVM. The test is done by recieving a string that acts as a password, but which allows for an overflow that can redirect to the password succcess option even if the password should have failed.
+
+To test this file, a specific compilation process must be used, which is as follows:
+```
+664-llvm/build/bin/clang -fvisibility=hidden -fsanitize=cfi -flto programs/ControlFlowIntegrity.c
+perl -e 'print "a"x8 .  "\x80\x06\x40"' | ./a.out
+```
+The result will indicate an Illegal Instruction has been passed.
+
 ### ConstantFolding (Tests Constant Folding & Constant Blinding)
 This file was created to test if the *constant folding* mitigation. It contains
 a very basic addition opertation of two long integers. Running through the LLJIT

@@ -1,10 +1,10 @@
-## CMPUT 664 Project - LLVM JIT Security Evaluation
+# CMPUT 664 Project - LLVM JIT Security Evaluation
 
 ### Clone the repo
 ```
 git clone https://github.com/ThanHenderson/664-LLJIT-Eval.git
 ```
-
+## Manual Install
 ### Initialize subdirectories (LLVM and quickjs)
 ```
 git submodule init
@@ -36,6 +36,15 @@ source init.sh
 ### Build LLJIT (creates LLJIT executable)
 ```
 make
+```
+
+## Docker install
+```
+sudo docker build -t jiteval .
+```
+
+```
+sudo docker run -it jiteval
 ```
 
 ### Running a program

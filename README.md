@@ -19,6 +19,9 @@ This can take an extreme amount of time, be patient.
 Note that the LLVM build in the Makefile is set for X86 targets only. If building
 for a different machine, the Makefile will need to be altered.
 
+There are also variations of llvm that can be built based on the analysis you want to perform:
+- Debug Info: `llvm-debug`
+- Control Flow Integrity Support: `llvm-cfi`
 
 ### Build quickjs
 ```

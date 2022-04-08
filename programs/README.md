@@ -12,7 +12,7 @@ This file is used to verify that the LLJIT works correctly, it acts as a test fi
 ### JS-Hello 
 This file is used to verify that the Javascript libraries are properly linked into the JIT and are working correctly. This should be used before running the other JS marked files.
 
-## Test Filesw
+## Test Files
 
 ### ConstantFolding (Tests Constant Folding & Constant Blinding)
 This file was created to test if the *constant folding* mitigation. It contains

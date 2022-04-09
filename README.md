@@ -4,13 +4,13 @@
 ```
 git clone https://github.com/ThanHenderson/664-LLJIT-Eval.git
 ```
-## Manual Install
 ### Initialize subdirectories (LLVM and quickjs)
 ```
 git submodule init
 git submodule update
 ```
 
+## Manual Install
 ### Build LLVM
 ```
 make llvm

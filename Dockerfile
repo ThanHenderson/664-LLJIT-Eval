@@ -15,8 +15,6 @@ RUN apt-get update && apt-get install -y \
 COPY . /home/Eval/
 WORKDIR /home/Eval/
 
-RUN git submodule init && git submodule update
-
 RUN make llvm
 
 RUN make qjs

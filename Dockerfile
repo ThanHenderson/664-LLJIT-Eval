@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
     git \
     make \
     cmake \
-    ninja-build
+    ninja-build \
+    ccache
 
 COPY . /home/Eval/
 WORKDIR /home/Eval/

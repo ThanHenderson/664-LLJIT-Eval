@@ -1,6 +1,5 @@
 FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
-SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && apt-get install -y \
     apt-utils \
@@ -10,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     make \
     cmake \
     ninja-build \
-    ccache
+    ccache \
+    vim
 
 COPY . /home/Eval/
 WORKDIR /home/Eval/
@@ -21,6 +21,4 @@ RUN make llvm
 
 RUN make qjs
 
-RUN source init.sh
-
-RUN make lljit
+RUN . init.sh && make lljit
